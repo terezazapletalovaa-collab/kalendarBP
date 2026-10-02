@@ -300,6 +300,18 @@
     .work-list { display:none !important; }
   }
 
+
+  .instructions-event{background:#fff3bf !important;border:1px dashed #d69e2e !important;color:#7a4b00 !important}
+  .reservation-event{background:#dbeafe !important;border:1px dashed #3b82f6 !important;color:#173f73 !important}
+  body.hide-instructions .instructions-event{display:none !important}
+  .work-list{margin-top:18px;border-top:2px solid #e0e4ea;padding-top:14px}.work-list h2{margin:0 0 10px;font-size:18px}
+  .trip-row{display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #e6e9ee}
+  .trip-info{min-width:0;font-size:12px}.trip-info strong{display:block;font-size:13px}.trip-date{color:var(--muted);margin-top:2px}
+  .trip-actions{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}.status-btn,.remove-btn{padding:5px 8px;border-radius:6px;font-size:11px}
+  .status-btn.done{background:#2e9d55;border-color:#237b42;color:#fff}.remove-btn{color:#a32121;border-color:#e0aaaa;background:#fff7f7}
+  @media(max-width:900px){.trip-row{grid-template-columns:1fr}.trip-actions{justify-content:flex-start}}
+  @media print{.work-list{display:none !important}}
+
 </style>
 </head>
 <body>
@@ -307,334 +319,73 @@
   <button id="prev">← Předchozí</button>
   <select id="monthSelect"></select>
   <button id="next">Další →</button>
+  <button id="toggleInstructions">Skrýt pokyny</button>
   <button class="primary" onclick="window.print()">Tisk / Uložit jako PDF</button>
 </div>
 <div class="wrap" id="app"></div>
 
 <script>
 const trips = [{"title": "Koupání v exotickém vodním ráji Tropical Islands", "start": "2027-01-23", "end": "2027-01-23"}, {"title": "Karneval v Benátkách", "start": "2027-01-29", "end": "2027-01-30"}, {"title": "Karneval v Benátkách", "start": "2027-01-29", "end": "2027-01-30"}, {"title": "Karneval v Benátkách", "start": "2027-01-29", "end": "2027-01-30"}, {"title": "Karneval v Benátkách", "start": "2027-01-29", "end": "2027-01-30"}, {"title": "Karneval v Benátkách", "start": "2027-02-05", "end": "2027-02-06"}, {"title": "Karneval v Benátkách", "start": "2027-02-05", "end": "2027-02-06"}, {"title": "Karneval v Benátkách", "start": "2027-02-05", "end": "2027-02-06"}, {"title": "Karneval v Benátkách", "start": "2027-02-05", "end": "2027-02-06"}, {"title": "Karneval v Benátkách", "start": "2027-02-08", "end": "2027-02-09"}, {"title": "Víkendové jarní Benátky", "start": "2027-02-12", "end": "2027-02-13"}, {"title": "Florencie, Řím, Vatikán", "start": "2027-02-25", "end": "2027-02-28"}, {"title": "Řím s odpočinkem v termálních lázních Saturnia", "start": "2027-03-18", "end": "2027-03-21"}, {"title": "4denní zájezd do Florencie a Říma", "start": "2027-03-19", "end": "2027-03-21"}, {"title": "Květinový park Keukenhof", "start": "2027-03-19", "end": "2027-03-20"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-03-19", "end": "2027-03-20"}, {"title": "Benátky a Verona", "start": "2027-03-19", "end": "2027-03-21"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-03-20", "end": "2027-03-20"}, {"title": "Ohrid a krásy Albánie", "start": "2027-03-24", "end": "2027-03-29"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Víkendové jarní Benátky", "start": "2027-03-25", "end": "2027-03-26"}, {"title": "Belgie plná překvapení", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Květinový park Keukenhof", "start": "2027-03-25", "end": "2027-03-26"}, {"title": "Amalfské pobřeží a Neapolský záliv", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Okruh severní Itálií", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Benátky a Verona", "start": "2027-03-26", "end": "2027-03-28"}, {"title": "Budapešť, Ostřihom a zámek Gödöllö", "start": "2027-03-26", "end": "2027-03-28"}, {"title": "Romantická Budapešť", "start": "2027-03-27", "end": "2027-03-28"}, {"title": "Víkendové jarní Benátky", "start": "2027-03-27", "end": "2027-03-28"}, {"title": "Květinový park Keukenhof", "start": "2027-03-27", "end": "2027-03-28"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-04-01", "end": "2027-04-04"}, {"title": "4denní Florencie a kouzelné Cinque Terre", "start": "2027-04-02", "end": "2027-04-04"}, {"title": "Květinový park Keukenhof s návštěvou Amsterdamu", "start": "2027-04-02", "end": "2027-04-04"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-04-02", "end": "2027-04-03"}, {"title": "Květinový park Keukenhof", "start": "2027-04-02", "end": "2027-04-03"}, {"title": "Tropicarium a ZOO Budapešť", "start": "2027-04-03", "end": "2027-04-03"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-04-03", "end": "2027-04-03"}, {"title": "Romantická Budapešť", "start": "2027-04-03", "end": "2027-04-04"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-04-08", "end": "2027-04-11"}, {"title": "Řím s odpočinkem v termálních lázních Saturnia", "start": "2027-04-08", "end": "2027-04-11"}, {"title": "Belgie plná překvapení", "start": "2027-04-08", "end": "2027-04-11"}, {"title": "Květinový park Keukenhof s návštěvou Amsterdamu", "start": "2027-04-09", "end": "2027-04-11"}, {"title": "4denní zájezd do Florencie a Říma", "start": "2027-04-09", "end": "2027-04-11"}, {"title": "Květinový park Keukenhof", "start": "2027-04-09", "end": "2027-04-10"}, {"title": "Benátky a Verona", "start": "2027-04-09", "end": "2027-04-11"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-04-10", "end": "2027-04-10"}, {"title": "Tropicarium a ZOO Budapešť", "start": "2027-04-10", "end": "2027-04-10"}, {"title": "Apulie a skalní město Matera", "start": "2027-04-14", "end": "2027-04-19"}, {"title": "Cesta za památkami do Rumunska", "start": "2027-04-15", "end": "2027-04-18"}, {"title": "Benátky a Verona", "start": "2027-04-16", "end": "2027-04-18"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-04-16", "end": "2027-04-17"}, {"title": "Květinový park Keukenhof", "start": "2027-04-16", "end": "2027-04-17"}, {"title": "Květinový park Keukenhof s návštěvou Amsterdamu", "start": "2027-04-16", "end": "2027-04-18"}, {"title": "Tropicarium a ZOO Budapešť", "start": "2027-04-17", "end": "2027-04-17"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-04-17", "end": "2027-04-17"}, {"title": "Amalfské pobřeží a Neapolský záliv", "start": "2027-04-22", "end": "2027-04-25"}, {"title": "Florencie, Řím, Vatikán", "start": "2027-04-22", "end": "2027-04-25"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-04-22", "end": "2027-04-25"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-04-22", "end": "2027-04-25"}, {"title": "Benátské ostrovy", "start": "2027-04-23", "end": "2027-04-25"}, {"title": "Květinový park Keukenhof s návštěvou Amsterdamu", "start": "2027-04-23", "end": "2027-04-25"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-04-23", "end": "2027-04-24"}, {"title": "Květinový park Keukenhof", "start": "2027-04-23", "end": "2027-04-24"}, {"title": "Romantická Budapešť", "start": "2027-04-24", "end": "2027-04-25"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-04-24", "end": "2027-04-24"}, {"title": "Tropicarium a ZOO Budapešť", "start": "2027-04-24", "end": "2027-04-24"}, {"title": "Řím s odpočinkem v termálních lázních Saturnia", "start": "2027-04-29", "end": "2027-05-02"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-04-29", "end": "2027-05-02"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-04-29", "end": "2027-05-02"}, {"title": "Benátky a Verona", "start": "2027-04-30", "end": "2027-05-02"}, {"title": "Návštěva Curychu se zastávkou u Rýnských vodopádů", "start": "2027-04-30", "end": "2027-05-01"}, {"title": "Květinový park Keukenhof", "start": "2027-04-30", "end": "2027-05-01"}, {"title": "Květinový park Keukenhof s návštěvou Amsterdamu", "start": "2027-04-30", "end": "2027-05-02"}, {"title": "4denní Florencie a kouzelné Cinque Terre", "start": "2027-04-30", "end": "2027-05-02"}, {"title": "Legoland se vstupem v ceně", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Bojnice – zámek a ZOO", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Za poznáním přírody i historie Severní Makedonie", "start": "2027-05-06", "end": "2027-05-09"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-05-06", "end": "2027-05-09"}, {"title": "Okruh severní Itálií", "start": "2027-05-06", "end": "2027-05-09"}, {"title": "Královské Sedmihradsko, solné doly a koupání v termálních lázních", "start": "2027-05-06", "end": "2027-05-09"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-05-06", "end": "2027-05-09"}, {"title": "Bodamské jezero – ostrov Mainau, Kostnice a kůlové stavby UNESCO", "start": "2027-05-07", "end": "2027-05-08"}, {"title": "Květinový park Keukenhof", "start": "2027-05-07", "end": "2027-05-08"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-05-07", "end": "2027-05-08"}, {"title": "Benátky a Verona", "start": "2027-05-07", "end": "2027-05-09"}, {"title": "4denní zájezd do Florencie a Říma", "start": "2027-05-07", "end": "2027-05-09"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-05-08", "end": "2027-05-08"}, {"title": "Legoland se vstupem v ceně", "start": "2027-05-08", "end": "2027-05-08"}, {"title": "Velký okruh Apulií s koupáním", "start": "2027-05-12", "end": "2027-05-16"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-05-13", "end": "2027-05-16"}, {"title": "Belgie plná překvapení", "start": "2027-05-13", "end": "2027-05-16"}, {"title": "Přírodní krásy v okolí jezera Lago di Garda s koupáním", "start": "2027-05-13", "end": "2027-05-16"}, {"title": "Amalfské pobřeží a Neapolský záliv", "start": "2027-05-13", "end": "2027-05-16"}, {"title": "Benátské ostrovy", "start": "2027-05-14", "end": "2027-05-16"}, {"title": "Návštěva Curychu se zastávkou u Rýnských vodopádů", "start": "2027-05-14", "end": "2027-05-15"}, {"title": "Pohádkové zámky Bavorska", "start": "2027-05-15", "end": "2027-05-16"}, {"title": "Romantická Budapešť", "start": "2027-05-15", "end": "2027-05-16"}, {"title": "Řím s odpočinkem v termálních lázních Saturnia", "start": "2027-05-20", "end": "2027-05-23"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-05-20", "end": "2027-05-23"}, {"title": "Návštěva Curychu se zastávkou u Rýnských vodopádů", "start": "2027-05-21", "end": "2027-05-22"}, {"title": "Benátky a Verona", "start": "2027-05-21", "end": "2027-05-23"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-05-21", "end": "2027-05-23"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-05-22", "end": "2027-05-22"}, {"title": "Florencie, Řím, Vatikán", "start": "2027-05-27", "end": "2027-05-30"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-05-27", "end": "2027-05-30"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-05-28", "end": "2027-05-29"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-05-28", "end": "2027-05-30"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-05-29", "end": "2027-05-29"}, {"title": "Milán a kouzelné jezero Lago Maggiore", "start": "2027-06-03", "end": "2027-06-06"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-06-05", "end": "2027-06-05"}, {"title": "Legoland se vstupem v ceně", "start": "2027-06-05", "end": "2027-06-05"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-06-07", "end": "2027-06-09"}, {"title": "Benátky a Verona", "start": "2027-06-07", "end": "2027-06-09"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-06-10", "end": "2027-06-13"}, {"title": "Švýcarsko s výhledy na Matterhorn", "start": "2027-06-10", "end": "2027-06-13"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-06-12", "end": "2027-06-12"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-06-14", "end": "2027-06-16"}, {"title": "Benátky a Lido di Jesolo", "start": "2027-06-14", "end": "2027-06-16"}, {"title": "Okruh Transylvánií", "start": "2027-06-17", "end": "2027-06-20"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-06-21", "end": "2027-06-23"}, {"title": "Benátky a Verona", "start": "2027-06-21", "end": "2027-06-23"}, {"title": "Přírodní krásy v okolí jezera Lago di Garda s koupáním", "start": "2027-06-24", "end": "2027-06-27"}, {"title": "Návštěva Toskánska s koupáním u moře", "start": "2027-06-24", "end": "2027-06-27"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-06-28", "end": "2027-06-30"}, {"title": "Benátky a Lido di Jesolo", "start": "2027-06-28", "end": "2027-06-30"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-06-29", "end": "2027-06-29"}, {"title": "Švýcarsko s výhledy na Matterhorn", "start": "2027-07-02", "end": "2027-07-05"}, {"title": "Okruh Transylvánií", "start": "2027-07-02", "end": "2027-07-05"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-07-02", "end": "2027-07-05"}, {"title": "Přírodní krásy v okolí jezera Lago di Garda s koupáním", "start": "2027-07-04", "end": "2027-07-07"}, {"title": "Jednodenní výlet k jezeru Lago di Garda s koupáním", "start": "2027-07-05", "end": "2027-07-07"}, {"title": "Romantická Budapešť", "start": "2027-07-05", "end": "2027-07-06"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-07-05", "end": "2027-07-05"}, {"title": "Benátky a Verona", "start": "2027-07-05", "end": "2027-07-07"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-07-05", "end": "2027-07-07"}, {"title": "Legoland se vstupem v ceně", "start": "2027-07-05", "end": "2027-07-05"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-07-05", "end": "2027-07-05"}, {"title": "Návštěva Curychu se zastávkou u Rýnských vodopádů", "start": "2027-07-05", "end": "2027-07-06"}, {"title": "Dvoudenní výlet za poznáním Berlína", "start": "2027-07-05", "end": "2027-07-06"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-07-05", "end": "2027-07-06"}, {"title": "Pohádkové zámky Bavorska", "start": "2027-07-06", "end": "2027-07-07"}, {"title": "Tropicarium a ZOO Budapešť", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Legoland se vstupem v ceně", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Koupání a zábava u Balatonu", "start": "2027-07-07", "end": "2027-07-07"}, {"title": "Lucembursko a nejslavnější města Belgie", "start": "2027-07-08", "end": "2027-07-11"}, {"title": "Benátky a Lido di Jesolo", "start": "2027-07-12", "end": "2027-07-14"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-07-12", "end": "2027-07-14"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-07-13", "end": "2027-07-13"}, {"title": "Belgie plná překvapení", "start": "2027-07-15", "end": "2027-07-18"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-07-17", "end": "2027-07-17"}, {"title": "Benátky a Verona", "start": "2027-07-19", "end": "2027-07-21"}, {"title": "Jednodenní výlet k jezeru Lago di Garda s koupáním", "start": "2027-07-19", "end": "2027-07-21"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-07-20", "end": "2027-07-20"}, {"title": "Koupání a zábava u Balatonu", "start": "2027-07-21", "end": "2027-07-21"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-07-21", "end": "2027-07-21"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-07-22", "end": "2027-07-22"}, {"title": "Legoland se vstupem v ceně", "start": "2027-07-22", "end": "2027-07-22"}, {"title": "Návštěva Curychu se zastávkou u Rýnských vodopádů", "start": "2027-07-26", "end": "2027-07-27"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-07-26", "end": "2027-07-28"}, {"title": "Benátky a Lido di Jesolo", "start": "2027-07-26", "end": "2027-07-28"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-07-27", "end": "2027-07-27"}, {"title": "Bojnice – zámek a ZOO", "start": "2027-07-27", "end": "2027-07-27"}, {"title": "Okruh Transylvánií", "start": "2027-07-29", "end": "2027-08-01"}, {"title": "Přírodní krásy v okolí jezera Lago di Garda s koupáním", "start": "2027-07-29", "end": "2027-08-01"}, {"title": "Legoland se vstupem v ceně", "start": "2027-07-29", "end": "2027-07-29"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-07-31", "end": "2027-07-31"}, {"title": "Benátky a Verona", "start": "2027-08-02", "end": "2027-08-04"}, {"title": "Jednodenní výlet k jezeru Lago di Garda s koupáním", "start": "2027-08-02", "end": "2027-08-04"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-08-02", "end": "2027-08-04"}, {"title": "Koupání a zábava u Balatonu", "start": "2027-08-04", "end": "2027-08-04"}, {"title": "5denní okruh Švýcarskem", "start": "2027-08-05", "end": "2027-08-08"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-08-05", "end": "2027-08-05"}, {"title": "Legoland se vstupem v ceně", "start": "2027-08-05", "end": "2027-08-05"}, {"title": "Švýcarsko s výhledy na Matterhorn", "start": "2027-08-05", "end": "2027-08-08"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-08-07", "end": "2027-08-07"}, {"title": "Návštěva Curychu se zastávkou u Rýnských vodopádů", "start": "2027-08-09", "end": "2027-08-10"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-08-09", "end": "2027-08-11"}, {"title": "Benátky a Lido di Jesolo", "start": "2027-08-09", "end": "2027-08-11"}, {"title": "Pohádkové zámky Bavorska", "start": "2027-08-10", "end": "2027-08-11"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-08-10", "end": "2027-08-10"}, {"title": "Koupání a zábava u Balatonu", "start": "2027-08-11", "end": "2027-08-11"}, {"title": "Krásy Francouzských a Švýcarských Alp", "start": "2027-08-12", "end": "2027-08-15"}, {"title": "Legoland se vstupem v ceně", "start": "2027-08-12", "end": "2027-08-12"}, {"title": "Okruh Transylvánií", "start": "2027-08-12", "end": "2027-08-15"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-08-14", "end": "2027-08-14"}, {"title": "Benátky a Lido di Jesolo", "start": "2027-08-16", "end": "2027-08-18"}, {"title": "Dvoudenní výlet za poznáním Berlína", "start": "2027-08-17", "end": "2027-08-18"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-08-17", "end": "2027-08-17"}, {"title": "Legoland se vstupem v ceně", "start": "2027-08-19", "end": "2027-08-19"}, {"title": "Okruh Transylvánií", "start": "2027-08-19", "end": "2027-08-22"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-08-19", "end": "2027-08-19"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-08-21", "end": "2027-08-21"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-08-23", "end": "2027-08-25"}, {"title": "Jednodenní výlet k jezeru Lago di Garda s koupáním", "start": "2027-08-23", "end": "2027-08-25"}, {"title": "Benátky a Verona", "start": "2027-08-23", "end": "2027-08-25"}, {"title": "Legoland se vstupem v ceně", "start": "2027-08-24", "end": "2027-08-24"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-08-24", "end": "2027-08-24"}, {"title": "Bojnice – zámek a ZOO", "start": "2027-08-26", "end": "2027-08-26"}, {"title": "Švýcarsko s výhledy na Matterhorn", "start": "2027-08-26", "end": "2027-08-29"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-08-26", "end": "2027-08-26"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-08-26", "end": "2027-08-26"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-08-30", "end": "2027-09-01"}, {"title": "Benátky a Lido di Jesolo", "start": "2027-08-30", "end": "2027-09-01"}, {"title": "Návštěva Toskánska s koupáním u moře", "start": "2027-09-02", "end": "2027-09-05"}, {"title": "Okruh Transylvánií", "start": "2027-09-02", "end": "2027-09-05"}, {"title": "Hamburk a plavba na ostrov Helgoland", "start": "2027-09-03", "end": "2027-09-05"}, {"title": "Květinové korzo a slavnosti lodí v Rotterdamu", "start": "2027-09-03", "end": "2027-09-05"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-09-04", "end": "2027-09-04"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-09-06", "end": "2027-09-08"}, {"title": "Benátky a Verona", "start": "2027-09-06", "end": "2027-09-08"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-09-09", "end": "2027-09-12"}, {"title": "Přírodní krásy v okolí jezera Lago di Garda s koupáním", "start": "2027-09-09", "end": "2027-09-12"}, {"title": "Milán a kouzelné jezero Lago Maggiore", "start": "2027-09-09", "end": "2027-09-12"}, {"title": "Legoland se vstupem v ceně", "start": "2027-09-11", "end": "2027-09-11"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-09-11", "end": "2027-09-11"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-09-13", "end": "2027-09-15"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-09-16", "end": "2027-09-19"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-09-16", "end": "2027-09-19"}, {"title": "Benátky a Verona", "start": "2027-09-17", "end": "2027-09-19"}, {"title": "Návštěva Curychu se zastávkou u Rýnských vodopádů", "start": "2027-09-17", "end": "2027-09-18"}, {"title": "Cesta za památkami do Rumunska", "start": "2027-09-17", "end": "2027-09-20"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-09-18", "end": "2027-09-18"}, {"title": "Pohádkové zámky Bavorska", "start": "2027-09-18", "end": "2027-09-19"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-09-20", "end": "2027-09-22"}, {"title": "Apulie a skalní město Matera", "start": "2027-09-22", "end": "2027-09-27"}, {"title": "Florencie, Řím, Vatikán", "start": "2027-09-23", "end": "2027-09-26"}, {"title": "Benátky a Verona", "start": "2027-09-24", "end": "2027-09-26"}, {"title": "Ohrid a krásy Albánie", "start": "2027-09-24", "end": "2027-09-29"}, {"title": "Bulharsko s koupáním v termálech", "start": "2027-09-24", "end": "2027-09-28"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-09-24", "end": "2027-09-27"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-09-24", "end": "2027-09-26"}, {"title": "Řím s odpočinkem v termálních lázních Saturnia", "start": "2027-09-24", "end": "2027-09-27"}, {"title": "Belgie plná překvapení", "start": "2027-09-24", "end": "2027-09-27"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-09-24", "end": "2027-09-27"}, {"title": "Okruh Transylvánií", "start": "2027-09-24", "end": "2027-09-27"}, {"title": "Amalfské pobřeží a Neapolský záliv", "start": "2027-09-24", "end": "2027-09-27"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-09-25", "end": "2027-09-25"}, {"title": "Legoland se vstupem v ceně", "start": "2027-09-25", "end": "2027-09-25"}, {"title": "Tropicarium a ZOO Budapešť", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Orlí hnízdo a jezero Königssee", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Legoland se vstupem v ceně", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-09-30", "end": "2027-10-03"}, {"title": "Za poznáním přírody i historie Severní Makedonie", "start": "2027-09-30", "end": "2027-10-03"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-10-01", "end": "2027-10-03"}, {"title": "Benátské ostrovy", "start": "2027-10-01", "end": "2027-10-03"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-07-16", "end": "2027-07-17"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-08-06", "end": "2027-08-07"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-08-27", "end": "2027-08-28"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-10-01", "end": "2027-10-02"}, {"title": "Delfinárium a ZOO v Norimberku", "start": "2027-10-02", "end": "2027-10-02"}, {"title": "Romantická Budapešť", "start": "2027-10-02", "end": "2027-10-03"}, {"title": "Tropicarium a ZOO Budapešť", "start": "2027-10-02", "end": "2027-10-02"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-10-02", "end": "2027-10-02"}, {"title": "Legoland se vstupem v ceně", "start": "2027-10-02", "end": "2027-10-02"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-10-07", "end": "2027-10-10"}, {"title": "Řím s odpočinkem v termálních lázních Saturnia", "start": "2027-10-07", "end": "2027-10-10"}, {"title": "Benátky a Verona", "start": "2027-10-08", "end": "2027-10-10"}, {"title": "4denní Florencie a kouzelné Cinque Terre", "start": "2027-10-08", "end": "2027-10-10"}, {"title": "Švýcarsko s panoramatickým vlakem UNESCO a Lichtenštejnsko", "start": "2027-10-08", "end": "2027-10-10"}, {"title": "Legoland se vstupem v ceně", "start": "2027-10-09", "end": "2027-10-09"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-10-14", "end": "2027-10-17"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-10-14", "end": "2027-10-17"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-10-15", "end": "2027-10-16"}, {"title": "4denní zájezd do Florencie a Říma", "start": "2027-10-15", "end": "2027-10-17"}, {"title": "Benátky a Verona", "start": "2027-10-15", "end": "2027-10-17"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-10-16", "end": "2027-10-16"}, {"title": "Velký okruh Apulií s koupáním", "start": "2027-10-20", "end": "2027-10-24"}, {"title": "Královské Sedmihradsko a solné doly Salina Turda", "start": "2027-10-22", "end": "2027-10-24"}, {"title": "Tropicarium a ZOO Budapešť", "start": "2027-10-23", "end": "2027-10-23"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-10-23", "end": "2027-10-23"}, {"title": "Romantická Budapešť", "start": "2027-10-23", "end": "2027-10-24"}, {"title": "Belgie plná překvapení", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Amalfské pobřeží a Neapolský záliv", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Řím a Neapolský záliv s plavbou na ostrov Capri", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Za poznáním přírody i historie Severní Makedonie", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Cinque Terre, Pisa, Lucca a Florencie", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Okruh severní Itálií", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Řím s odpočinkem v termálních lázních Saturnia", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Benátky a Verona", "start": "2027-10-28", "end": "2027-10-30"}, {"title": "4denní Florencie a kouzelné Cinque Terre", "start": "2027-10-28", "end": "2027-10-30"}, {"title": "Florencie, Řím, Vatikán", "start": "2027-10-28", "end": "2027-10-31"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-10-28", "end": "2027-10-28"}, {"title": "To nejlepší z Amsterdamu", "start": "2027-10-29", "end": "2027-10-30"}, {"title": "Budapešť, Ostřihom a zámek Gödöllö", "start": "2027-10-29", "end": "2027-10-31"}, {"title": "Benátky a Verona", "start": "2027-11-05", "end": "2027-11-07"}, {"title": "4denní zájezd do Florencie a Říma", "start": "2027-11-05", "end": "2027-11-07"}, {"title": "Romantická Budapešť", "start": "2027-11-06", "end": "2027-11-07"}, {"title": "Tropicarium a ZOO Budapešť", "start": "2027-11-06", "end": "2027-11-06"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-11-06", "end": "2027-11-06"}, {"title": "Benátky a Verona", "start": "2027-11-12", "end": "2027-11-14"}, {"title": "Tropicarium a ZOO Budapešť", "start": "2027-11-13", "end": "2027-11-13"}, {"title": "Koupání v exotickém vodním ráji Tropical Islands", "start": "2027-11-13", "end": "2027-11-13"}, {"title": "Jednodenní výlet za památkami do Budapešti", "start": "2027-11-13", "end": "2027-11-13"}, {"title": "Řím s odpočinkem v termálních lázních Saturnia", "start": "2027-11-17", "end": "2027-11-20"}, {"title": "Koupání v exotickém vodním ráji Tropical Islands", "start": "2027-11-17", "end": "2027-11-17"}];
-const YEAR = 2027;
-const monthNamesTitle = ["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"];
-const weekdays = ["Po","Út","St","Čt","Pá","So","Ne"];
-const STATUS_LABELS = ["ubytování","průvodce","pokyny","odbavení","rezervace"];
-const STORAGE_PREFIX = "bp-kalendar-2027";
 
-function parseISO(s) {
-  const [y,m,d] = s.split("-").map(Number);
-  return new Date(y,m-1,d,12,0,0);
-}
-function addDays(d,n) {
-  const x = new Date(d);
-  x.setDate(x.getDate()+n);
-  return x;
-}
-function mondayIndex(jsDay) { return (jsDay+6)%7; }
-function minDate(a,b) { return a < b ? a : b; }
-function maxDate(a,b) { return a > b ? a : b; }
-function dateKey(d) {
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-function tripKey(t) {
-  return `${t.id}|${t.title}|${t.start}|${t.end}`;
-}
-function removedKey(t) { return `${STORAGE_PREFIX}:removed:${tripKey(t)}`; }
-function statusKey(t,status) { return `${STORAGE_PREFIX}:status:${tripKey(t)}:${status}`; }
-function isRemoved(t) { return localStorage.getItem(removedKey(t)) === "1"; }
-function activeTrips() { return trips.filter(t=>!isRemoved(t)); }
+const YEAR=2027;
+const monthNamesTitle=["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"];
+const weekdays=["Po","Út","St","Čt","Pá","So","Ne"];
+const STATUS_LABELS=["ubytování","průvodce","pokyny","odbavení","rezervace"];
+const STORAGE_PREFIX="bp-kalendar-2027-v3";
+function parseISO(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d,12)}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function addMonths(d,n){const x=new Date(d),day=x.getDate();x.setDate(1);x.setMonth(x.getMonth()+n);x.setDate(Math.min(day,new Date(x.getFullYear(),x.getMonth()+1,0,12).getDate()));return x}
+function mondayIndex(d){return(d+6)%7} function minDate(a,b){return a<b?a:b} function maxDate(a,b){return a>b?a:b}
+function norm(s){return s.toLocaleLowerCase("cs-CZ")}
+function tripKey(t){return `${t.id}|${t.title}|${t.start}|${t.end}`}
+function removedKey(t){return `${STORAGE_PREFIX}:removed:${tripKey(t)}`} function statusKey(t,s){return `${STORAGE_PREFIX}:status:${tripKey(t)}:${s}`}
+function isRemoved(t){return localStorage.getItem(removedKey(t))==="1"} function activeTrips(){return trips.filter(t=>!isRemoved(t))}
+trips.forEach((t,i)=>{t.id=i;t.startD=parseISO(t.start);t.endD=parseISO(t.end)});
 
-function instructionsDate(t) {
-  let d = addDays(t.startD,-10);
-  if (d.getDay() === 6) d = addDays(d,-1); // sobota -> pátek
-  if (d.getDay() === 0) d = addDays(d,-2); // neděle -> pátek
-  return d;
-}
+function instructionsDate(t){let d=addDays(t.startD,norm(t.title).includes("paříž")?-30:-10);if(d.getDay()===6)d=addDays(d,-1);if(d.getDay()===0)d=addDays(d,-2);return d}
+const rules=[
+[["provence"],"d",21],[["vělička"],"m",1],[["osvětim"],"d",14],[["cinque terre"],"d",5],
+[["karneval v benátkách"],"d",7],[["jarní benátky"],"d",7],[["benátky"],"d",7],
+[["hallstatt"],"d",7],[["orlí hnízdo"],"d",7],[["legoland"],"d",3],[["amalfské pobřeží"],"d",10],
+[["capri"],"d",10],[["apulie"],"d",10],[["bavorské zámky","zámky bavorska"],"d",42],
+[["tropicarium"],"d",2],[["velký okruh polskem"],"d",10],[["slovinsko"],"m",2],[["karlštejn"],"m",4],
+[["wachau"],"d",7],[["katalánsko"],"m",1],[["plitvice","plitvická"],"d",7],[["bojnice"],"m",1],
+[["keukenhof"],"m",2],[["matterhorn"],"d",2],[["čokoládovna","franzensburg","franzesburgh"],"m",4],
+[["chorvatské národní parky"],"d",7],[["4denní florencie"],"d",7],[["menton"],"d",14],
+[["okruh severní itálií"],"d",7],[["belgie"],"d",10],[["londýn, windsor a brighton","londýn a brighton"],"d",21],
+[["jižní anglie"],"m",1],[["tropical island"],"d",4],[["bodamské jezero"],"m",2],[["gardaland"],"d",10]
+];
+function reservationDate(t){const s=norm(t.title),r=rules.find(x=>x[0].some(k=>s.includes(k)));if(!r)return null;return r[1]==="m"?addMonths(t.startD,-r[2]):addDays(t.startD,-r[2])}
 
-trips.forEach((t,i)=>{
-  t.id=i;
-  t.startD=parseISO(t.start);
-  t.endD=parseISO(t.end);
-});
-
-const titles=[...new Set(trips.map(t=>t.title))].sort((a,b)=>a.localeCompare(b,"cs"));
-const colorMap=new Map();
-titles.forEach((title,i)=>{
-  const hue=(i*137.508)%360;
-  const sat=58+(i%3)*7;
-  const light=76-(i%4)*4;
-  colorMap.set(title,`hsl(${hue.toFixed(1)} ${sat}% ${light}%)`);
-});
-
-function monthBounds(month) {
-  return {
-    start:new Date(YEAR,month,1,12),
-    end:new Date(YEAR,month+1,0,12)
-  };
-}
-function monthWeeks(month) {
-  const {start,end}=monthBounds(month);
-  const gridStart=addDays(start,-mondayIndex(start.getDay()));
-  const gridEnd=addDays(end,6-mondayIndex(end.getDay()));
-  const weeks=[];
-  for(let w=new Date(gridStart);w<=gridEnd;w=addDays(w,7)) {
-    weeks.push(Array.from({length:7},(_,i)=>addDays(w,i)));
-  }
-  return weeks;
-}
-function monthTrips(month) {
-  const {start,end}=monthBounds(month);
-  return activeTrips().filter(t=>t.startD<=end && t.endD>=start);
-}
-function monthInstructionItems(month) {
-  const {start,end}=monthBounds(month);
-  return activeTrips()
-    .map(t=>({trip:t,date:instructionsDate(t)}))
-    .filter(x=>x.date>=start && x.date<=end);
-}
-
-function segmentsForWeek(month,weekDays) {
-  const m=monthBounds(month);
-  const ws=weekDays[0], we=weekDays[6];
-  const segs=[];
-
-  for(const t of monthTrips(month)) {
-    const a=maxDate(t.startD,maxDate(ws,m.start));
-    const b=minDate(t.endD,minDate(we,m.end));
-    if(a<=b) {
-      segs.push({
-        type:"trip", trip:t, start:a, end:b,
-        startCol:mondayIndex(a.getDay()), endCol:mondayIndex(b.getDay()),
-        continuesLeft:t.startD<a, continuesRight:t.endD>b
-      });
-    }
-  }
-
-  for(const item of monthInstructionItems(month)) {
-    if(item.date>=ws && item.date<=we) {
-      segs.push({
-        type:"instructions", trip:item.trip, start:item.date, end:item.date,
-        startCol:mondayIndex(item.date.getDay()), endCol:mondayIndex(item.date.getDay()),
-        continuesLeft:false, continuesRight:false
-      });
-    }
-  }
-
-  segs.sort((x,y)=>x.start-y.start || (x.type==="instructions"?-1:1) || x.trip.title.localeCompare(y.trip.title,"cs"));
-  const laneEnds=[];
-  for(const s of segs) {
-    let lane=-1;
-    for(let i=0;i<laneEnds.length;i++) {
-      if(s.start>laneEnds[i]) { lane=i; break; }
-    }
-    if(lane===-1) { lane=laneEnds.length; laneEnds.push(s.end); }
-    else laneEnds[lane]=s.end;
-    s.lane=lane;
-  }
-  return {segs,laneCount:laneEnds.length};
-}
-
-function createWorkList(month) {
-  const box=document.createElement("div");
-  box.className="work-list";
-  const h=document.createElement("h2");
-  h.textContent="Kontrola zájezdů";
-  box.appendChild(h);
-
-  const items=activeTrips()
-    .filter(t=>t.startD.getFullYear()===YEAR && t.startD.getMonth()===month)
-    .sort((a,b)=>a.startD-b.startD || a.title.localeCompare(b.title,"cs"));
-
-  for(const t of items) {
-    const row=document.createElement("div");
-    row.className="trip-row";
-
-    const info=document.createElement("div");
-    info.className="trip-info";
-    info.innerHTML=`<strong>${t.title}</strong><div class="trip-date">${t.startD.toLocaleDateString("cs-CZ")} – ${t.endD.toLocaleDateString("cs-CZ")}</div>`;
-    row.appendChild(info);
-
-    const actions=document.createElement("div");
-    actions.className="trip-actions";
-
-    STATUS_LABELS.forEach(status=>{
-      const btn=document.createElement("button");
-      btn.className="status-btn";
-      btn.textContent=status;
-      if(localStorage.getItem(statusKey(t,status))==="1") btn.classList.add("done");
-      btn.onclick=()=>{
-        const done=btn.classList.toggle("done");
-        if(done) localStorage.setItem(statusKey(t,status),"1");
-        else localStorage.removeItem(statusKey(t,status));
-      };
-      actions.appendChild(btn);
-    });
-
-    const remove=document.createElement("button");
-    remove.className="remove-btn";
-    remove.textContent="Odstranit";
-    remove.onclick=()=>{
-      if(confirm(`Opravdu odstranit termín „${t.title}“ (${t.startD.toLocaleDateString("cs-CZ")})?`)) {
-        localStorage.setItem(removedKey(t),"1");
-        renderAll(month);
-      }
-    };
-    actions.appendChild(remove);
-    row.appendChild(actions);
-    box.appendChild(row);
-  }
-
-  if(!items.length) {
-    const empty=document.createElement("div");
-    empty.className="note";
-    empty.textContent="V tomto měsíci nejsou žádné odjezdy.";
-    box.appendChild(empty);
-  }
-  return box;
-}
-
-function createMonth(month) {
-  const section=document.createElement("section");
-  section.className="month";
-  section.dataset.month=month;
-
-  const items=monthTrips(month);
-  const unique=[...new Set(items.map(x=>x.title))].sort((a,b)=>a.localeCompare(b,"cs"));
-
-  const head=document.createElement("div");
-  head.className="month-title";
-  head.innerHTML=`<h1>${monthNamesTitle[month]} ${YEAR}</h1>
-    <div class="meta">${items.length} termínů · ${unique.length} různých zájezdů</div>`;
-  section.appendChild(head);
-
-  const weekdaysRow=document.createElement("div");
-  weekdaysRow.className="weekday-row";
-  weekdays.forEach(w=>{
-    const el=document.createElement("div");
-    el.className="weekday";
-    el.textContent=w;
-    weekdaysRow.appendChild(el);
-  });
-  section.appendChild(weekdaysRow);
-
-  for(const weekDays of monthWeeks(month)) {
-    const {segs,laneCount}=segmentsForWeek(month,weekDays);
-    const week=document.createElement("div");
-    week.className="week";
-    week.style.height=`calc(var(--daynum-h) + ${Math.max(laneCount,1)} * (var(--lane-h) + var(--lane-gap)) + 5px)`;
-
-    weekDays.forEach((d,idx)=>{
-      const cell=document.createElement("div");
-      cell.className="day";
-      if(d.getMonth()!==month) cell.classList.add("out");
-      if(idx>=5) cell.classList.add("weekend");
-      const n=document.createElement("div");
-      n.className="daynum";
-      n.textContent=d.getDate();
-      cell.appendChild(n);
-      week.appendChild(cell);
-    });
-
-    const layer=document.createElement("div");
-    layer.className="events";
-    for(const s of segs) {
-      const el=document.createElement("div");
-      el.className="event";
-      if(s.type==="instructions") el.classList.add("instructions-event");
-      if(s.continuesLeft) el.classList.add("cont-left");
-      if(s.continuesRight) el.classList.add("cont-right");
-      el.style.left=`calc(${s.startCol} * (100% / 7) + 2px)`;
-      el.style.width=`calc(${s.endCol-s.startCol+1} * (100% / 7) - 4px)`;
-      el.style.top=`calc(${s.lane} * (var(--lane-h) + var(--lane-gap)))`;
-
-      if(s.type==="instructions") {
-        el.title=`Pokyny pro zájezd ${s.trip.title} · odjezd ${s.trip.startD.toLocaleDateString("cs-CZ")}`;
-        el.textContent=`Pokyny pro zájezd ${s.trip.title}`;
-      } else {
-        el.style.background=colorMap.get(s.trip.title);
-        el.title=`${s.trip.title} · ${s.trip.startD.toLocaleDateString("cs-CZ")}–${s.trip.endD.toLocaleDateString("cs-CZ")}`;
-        el.textContent=s.trip.title;
-      }
-      layer.appendChild(el);
-    }
-    week.appendChild(layer);
-    section.appendChild(week);
-  }
-
-  const legend=document.createElement("div");
-  legend.className="legend";
-  unique.forEach(title=>{
-    const item=document.createElement("div");
-    item.className="legend-item";
-    item.title=title;
-    item.innerHTML=`<span class="swatch" style="background:${colorMap.get(title)}"></span>
-      <span class="legend-text">${title}</span>`;
-    legend.appendChild(item);
-  });
-  section.appendChild(legend);
-
-  const note=document.createElement("div");
-  note.className="note";
-  note.textContent="Stejný zájezd má ve všech měsících stejnou barvu. Pokyny jsou automaticky 10 dní před odjezdem; pokud datum připadne na sobotu nebo neděli, zobrazí se v pátek.";
-  section.appendChild(note);
-  section.appendChild(createWorkList(month));
-  return section;
-}
-
-const app=document.getElementById("app");
-const select=document.getElementById("monthSelect");
-let monthsWithTrips=[];
-let currentIndex=0;
-
-function calculateMonths() {
-  const set=new Set();
-  activeTrips().forEach(t=>{
-    let d=new Date(t.startD);
-    while(d<=t.endD) {
-      if(d.getFullYear()===YEAR) set.add(d.getMonth());
-      d=new Date(d.getFullYear(),d.getMonth()+1,1,12);
-    }
-    const p=instructionsDate(t);
-    if(p.getFullYear()===YEAR) set.add(p.getMonth());
-  });
-  return [...set].sort((a,b)=>a-b);
-}
-
-function renderAll(preferredMonth=null) {
-  const previousMonth=preferredMonth!==null ? preferredMonth : (monthsWithTrips[currentIndex] ?? null);
-  monthsWithTrips=calculateMonths();
-  app.innerHTML="";
-  select.innerHTML="";
-  monthsWithTrips.forEach(m=>{
-    app.appendChild(createMonth(m));
-    const o=document.createElement("option");
-    o.value=m;
-    o.textContent=`${monthNamesTitle[m]} ${YEAR}`;
-    select.appendChild(o);
-  });
-  if(previousMonth!==null && monthsWithTrips.includes(previousMonth)) currentIndex=monthsWithTrips.indexOf(previousMonth);
-  else currentIndex=Math.min(currentIndex,Math.max(monthsWithTrips.length-1,0));
-  showMonth();
-}
-
-function showMonth() {
-  document.querySelectorAll(".month").forEach((el,i)=>el.classList.toggle("hidden-screen",i!==currentIndex));
-  if(monthsWithTrips.length) select.value=monthsWithTrips[currentIndex];
-}
-
-document.getElementById("prev").onclick=()=>{
-  if(!monthsWithTrips.length) return;
-  currentIndex=(currentIndex-1+monthsWithTrips.length)%monthsWithTrips.length;
-  showMonth();
-};
-document.getElementById("next").onclick=()=>{
-  if(!monthsWithTrips.length) return;
-  currentIndex=(currentIndex+1)%monthsWithTrips.length;
-  showMonth();
-};
-select.onchange=()=>{
-  currentIndex=monthsWithTrips.indexOf(Number(select.value));
-  showMonth();
-};
-
+const titles=[...new Set(trips.map(t=>t.title))].sort((a,b)=>a.localeCompare(b,"cs")),colorMap=new Map();
+titles.forEach((title,i)=>{const h=(i*137.508)%360,s=58+(i%3)*7,l=76-(i%4)*4;colorMap.set(title,`hsl(${h.toFixed(1)} ${s}% ${l}%)`)});
+function monthBounds(m){return{start:new Date(YEAR,m,1,12),end:new Date(YEAR,m+1,0,12)}}
+function monthWeeks(m){const {start,end}=monthBounds(m),gs=addDays(start,-mondayIndex(start.getDay())),ge=addDays(end,6-mondayIndex(end.getDay())),a=[];for(let w=new Date(gs);w<=ge;w=addDays(w,7))a.push(Array.from({length:7},(_,i)=>addDays(w,i)));return a}
+function monthTrips(m){const b=monthBounds(m);return activeTrips().filter(t=>t.startD<=b.end&&t.endD>=b.start)}
+function datedItems(m,fn){const b=monthBounds(m);return activeTrips().map(t=>({trip:t,date:fn(t)})).filter(x=>x.date&&x.date>=b.start&&x.date<=b.end)}
+function segmentsForWeek(m,wd){const b=monthBounds(m),ws=wd[0],we=wd[6],a=[];
+ for(const t of monthTrips(m)){const x=maxDate(t.startD,maxDate(ws,b.start)),y=minDate(t.endD,minDate(we,b.end));if(x<=y)a.push({type:"trip",trip:t,start:x,end:y,startCol:mondayIndex(x.getDay()),endCol:mondayIndex(y.getDay()),cl:t.startD<x,cr:t.endD>y})}
+ for(const x of datedItems(m,instructionsDate))if(x.date>=ws&&x.date<=we)a.push({type:"instructions",trip:x.trip,start:x.date,end:x.date,startCol:mondayIndex(x.date.getDay()),endCol:mondayIndex(x.date.getDay())});
+ for(const x of datedItems(m,reservationDate))if(x.date>=ws&&x.date<=we)a.push({type:"reservation",trip:x.trip,start:x.date,end:x.date,startCol:mondayIndex(x.date.getDay()),endCol:mondayIndex(x.date.getDay())});
+ a.sort((x,y)=>x.start-y.start||x.trip.title.localeCompare(y.trip.title,"cs"));const ends=[];for(const s of a){let l=ends.findIndex(e=>s.start>e);if(l<0){l=ends.length;ends.push(s.end)}else ends[l]=s.end;s.lane=l}return{segs:a,laneCount:ends.length}}
+function createWorkList(m){const box=document.createElement("div");box.className="work-list";box.innerHTML="<h2>Kontrola zájezdů</h2>";
+ const its=activeTrips().filter(t=>t.startD.getFullYear()===YEAR&&t.startD.getMonth()===m).sort((a,b)=>a.startD-b.startD);
+ for(const t of its){const row=document.createElement("div");row.className="trip-row";row.innerHTML=`<div class="trip-info"><strong>${t.title}</strong><div class="trip-date">${t.startD.toLocaleDateString("cs-CZ")} – ${t.endD.toLocaleDateString("cs-CZ")}</div></div>`;const ac=document.createElement("div");ac.className="trip-actions";
+ STATUS_LABELS.forEach(s=>{const b=document.createElement("button");b.className="status-btn";b.textContent=s;if(localStorage.getItem(statusKey(t,s))==="1")b.classList.add("done");b.onclick=()=>{const d=b.classList.toggle("done");d?localStorage.setItem(statusKey(t,s),"1"):localStorage.removeItem(statusKey(t,s))};ac.appendChild(b)});
+ const rm=document.createElement("button");rm.className="remove-btn";rm.textContent="Odstranit";rm.onclick=()=>{if(confirm(`Odstranit „${t.title}“ (${t.startD.toLocaleDateString("cs-CZ")})?`)){localStorage.setItem(removedKey(t),"1");renderAll(m)}};ac.appendChild(rm);row.appendChild(ac);box.appendChild(row)}return box}
+function createMonth(m){const sec=document.createElement("section");sec.className="month";sec.dataset.month=m;const its=monthTrips(m),un=[...new Set(its.map(x=>x.title))].sort((a,b)=>a.localeCompare(b,"cs"));
+ const hd=document.createElement("div");hd.className="month-title";hd.innerHTML=`<h1>${monthNamesTitle[m]} ${YEAR}</h1><div class="meta">${its.length} termínů · ${un.length} různých zájezdů</div>`;sec.appendChild(hd);
+ const wr=document.createElement("div");wr.className="weekday-row";weekdays.forEach(w=>{const e=document.createElement("div");e.className="weekday";e.textContent=w;wr.appendChild(e)});sec.appendChild(wr);
+ for(const wd of monthWeeks(m)){const {segs,laneCount}=segmentsForWeek(m,wd),week=document.createElement("div");week.className="week";week.style.height=`calc(var(--daynum-h) + ${Math.max(laneCount,1)} * (var(--lane-h) + var(--lane-gap)) + 5px)`;
+ wd.forEach((d,i)=>{const c=document.createElement("div");c.className="day";if(d.getMonth()!==m)c.classList.add("out");if(i>=5)c.classList.add("weekend");c.innerHTML=`<div class="daynum">${d.getDate()}</div>`;week.appendChild(c)});
+ const layer=document.createElement("div");layer.className="events";for(const s of segs){const e=document.createElement("div");e.className="event";if(s.type==="instructions")e.classList.add("instructions-event");if(s.type==="reservation")e.classList.add("reservation-event");if(s.cl)e.classList.add("cont-left");if(s.cr)e.classList.add("cont-right");e.style.left=`calc(${s.startCol} * (100% / 7) + 2px)`;e.style.width=`calc(${s.endCol-s.startCol+1} * (100% / 7) - 4px)`;e.style.top=`calc(${s.lane} * (var(--lane-h) + var(--lane-gap)))`;if(s.type==="trip"){e.style.background=colorMap.get(s.trip.title);e.textContent=s.trip.title}else if(s.type==="instructions")e.textContent=`Pokyny pro zájezd ${s.trip.title}`;else e.textContent=`Rezervace – ${s.trip.title}`;layer.appendChild(e)}week.appendChild(layer);sec.appendChild(week)}
+ const lg=document.createElement("div");lg.className="legend";un.forEach(t=>{const i=document.createElement("div");i.className="legend-item";i.innerHTML=`<span class="swatch" style="background:${colorMap.get(t)}"></span><span class="legend-text">${t}</span>`;lg.appendChild(i)});sec.appendChild(lg);sec.appendChild(createWorkList(m));return sec}
+const app=document.getElementById("app"),select=document.getElementById("monthSelect");let monthsWithTrips=[],currentIndex=0;
+function calcMonths(){const s=new Set();activeTrips().forEach(t=>{let d=new Date(t.startD);while(d<=t.endD){if(d.getFullYear()===YEAR)s.add(d.getMonth());d=new Date(d.getFullYear(),d.getMonth()+1,1,12)};[instructionsDate(t),reservationDate(t)].forEach(x=>{if(x&&x.getFullYear()===YEAR)s.add(x.getMonth())})});return[...s].sort((a,b)=>a-b)}
+function renderAll(pm=null){const old=pm!==null?pm:(monthsWithTrips[currentIndex]??null);monthsWithTrips=calcMonths();app.innerHTML="";select.innerHTML="";monthsWithTrips.forEach(m=>{app.appendChild(createMonth(m));const o=document.createElement("option");o.value=m;o.textContent=`${monthNamesTitle[m]} ${YEAR}`;select.appendChild(o)});currentIndex=old!==null&&monthsWithTrips.includes(old)?monthsWithTrips.indexOf(old):0;showMonth()}
+function showMonth(){document.querySelectorAll(".month").forEach((e,i)=>e.classList.toggle("hidden-screen",i!==currentIndex));if(monthsWithTrips.length)select.value=monthsWithTrips[currentIndex]}
+document.getElementById("prev").onclick=()=>{currentIndex=(currentIndex-1+monthsWithTrips.length)%monthsWithTrips.length;showMonth()};document.getElementById("next").onclick=()=>{currentIndex=(currentIndex+1)%monthsWithTrips.length;showMonth()};select.onchange=()=>{currentIndex=monthsWithTrips.indexOf(Number(select.value));showMonth()};
+const toggle=document.getElementById("toggleInstructions");toggle.onclick=()=>{const h=document.body.classList.toggle("hide-instructions");toggle.textContent=h?"Zobrazit pokyny":"Skrýt pokyny"};
 renderAll();
 
 </script>
